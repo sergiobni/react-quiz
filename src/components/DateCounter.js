@@ -7,11 +7,12 @@ function reducer(state, action) {
 
   switch (action.type) {
     case 'dec':
+      //Sobreescribimos el objeto initialState que contiene toda la información
       return { ...state, count: state.count - state.step };
     case 'inc':
       return { ...state, count: state.count + state.step };
     case 'setCount':
-      return { ...state, count: state.payload };
+      return { ...state, count: action.payload };
     case 'setStep':
       return { ...state, step: action.payload };
     case 'reset':

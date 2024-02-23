@@ -4,12 +4,15 @@ import Main from './Main';
 import Loader from './Loader';
 import Error from './Error';
 import StartScreen from './StartScreen';
+import Question from './Question';
 
 const initialState = {
   questions: [],
 
   //Loading, error, ready, active, finished
   status: 'loading',
+  //Index of question displayed
+  index: 0,
 };
 
 function reducer(state, action) {
@@ -25,13 +28,21 @@ function reducer(state, action) {
         ...state,
         status: 'error',
       };
+    case 'start':
+      return {
+        ...state,
+        status: 'active',
+      };
     default:
       throw new Error('Action unknown');
   }
 }
 
 export default function App() {
-  const [{ questions, status }, dispatch] = useReducer(reducer, initialState);
+  const [{ questions, status, index }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   //Calculating derived state, the amount of questions
   const numQuestions = questions.length;
@@ -41,14 +52,17 @@ export default function App() {
       .then(res => res.json())
       .then(data => dispatch({ type: 'dataReceived', payload: data }))
       .catch(err => dispatch({ type: 'dataFailed' }));
-  });
+  }, []);
   return (
     <div className="app">
       <Header />
       <Main>
         {status === 'loading' && <Loader />}
         {status === 'error' && <Error />}
-        {status === 'ready' && <StartScreen numQuestions={numQuestions} />}
+        {status === 'ready' && (
+          <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
+        )}
+        {status === 'active' && <Question question={questions[index]} />}
       </Main>
     </div>
   );
